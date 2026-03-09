@@ -80,7 +80,7 @@ mark{background:rgba(192,160,112,0.2);color:#9a7a50;border-radius:2px;padding:0 
 <script>
 function checkPw() {
   var val = document.getElementById('pw-input').value;
-  if(val === 'calily2026!88') {
+  if(val === (window.CALILY_CONFIG&&window.CALILY_CONFIG.password||'calily2026!88')) {
     document.getElementById('gate').style.display = 'none';
     sessionStorage.setItem('calily_auth','1');
   } else {
@@ -127,14 +127,16 @@ if(sessionStorage.getItem('calily_auth')==='1') {
 </div>
 
 <script>
+// FILTER_OPTS — driven by config.js. Falls back to hardcoded if config not loaded.
+var _cfg = window.CALILY_CONFIG || {};
 var FILTER_OPTS = {
-  who:    ['ALL','LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE','OTHER/NA'],
-  product:['ALL','OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE','CLASSIC PEARL DROP','PEARL HOOP DROP','CRYSTAL TEARDROP','THREE PEARL DROP','LARGE PEARL HOOP','PEARL CHAIN','BEATRICE HAIRPIN','GISELLE HAIRPIN','LINNEA','JASMINE HAIRPIN','MIRABELLA HAIRPIN','ROSALIA CHOKER','FLORENCE CHOKER','OTHER/NA'],
-  format: ['ALL','BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE'],
-  action: ['ALL','MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING','OTHER/NA'],
-  shot:    ['ALL','CLOSEUP','PANOVER'],
-  mood:    ['ALL','elegant','joyful','intimate','celebratory','romantic','peaceful','energetic'],
-  setting: ['ALL','HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR','OTHER/NA'],
+  who:     ['ALL'].concat(_cfg.who     || ['LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE']).concat(['OTHER/NA']),
+  product: ['ALL'].concat(_cfg.products|| ['OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE']).concat(['OTHER/NA']),
+  format:  ['ALL'].concat(_cfg.formats  || ['BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE']),
+  action:  ['ALL'].concat(Object.keys(_cfg.actions||{}).length ? Object.keys(_cfg.actions) : ['MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING']).concat(['OTHER/NA']),
+  shot:    ['ALL'].concat(_cfg.shots    || ['CLOSEUP','PANOVER']),
+  mood:    ['ALL'].concat(_cfg.moods    || ['elegant','joyful','intimate','celebratory','romantic','peaceful','energetic']),
+  setting: ['ALL'].concat(Object.keys(_cfg.settings||{}).length ? Object.keys(_cfg.settings) : ['HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR']).concat(['OTHER/NA']),
   folder:  ['ALL']
 };
 
@@ -310,7 +312,7 @@ function buildFilters(){
 }
 
 function buildSuggestions(){
-  var s=['Lillie veil studio','Emilia modeling','Freya veil','Karolina','closeup','Bali shoot','China factory'];
+  var s=(_cfg.suggestions)||['Lillie veil studio','Emilia modeling','Freya veil','Karolina','closeup','Bali shoot','China factory'];
   document.getElementById('suggestions').innerHTML=s.map(function(t){
     return '<button onclick="document.getElementById(\'search\').value=\''+t+'\';state.query=\''+t+'\';run()" style="background:#fff;border:1px solid #e6ddd2;color:#6a5a4e;border-radius:20px;padding:5px 14px;font-size:11px;cursor:pointer">'+t+'</button>';
   }).join('');
@@ -327,6 +329,7 @@ function init(){
 }
 </script>
 
+<script src="config.js"></script>
 <script src="data.js" onload="init()" onerror="document.getElementById('results').innerHTML='<div class=\'loading\' style=\'color:#c04040\'>Error: data.js not found. Make sure both files are uploaded to GitHub.</div>'"></script>
 
 </body>
