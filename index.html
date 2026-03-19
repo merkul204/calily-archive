@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Calily Video Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#faf8f5;font-family:'DM Sans',sans-serif;color:#3a3028}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:#b5a494;border-radius:2px}
+input,select,button{font-family:'DM Sans',sans-serif}
+mark{background:rgba(192,160,112,0.2);color:#9a7a50;border-radius:2px;padding:0 1px;font-weight:600}
+.header{background:#fff;border-bottom:1px solid #e6ddd2;padding:0 32px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{font-family:'Cormorant Garamond',serif;font-size:17px;letter-spacing:0.14em;text-transform:uppercase}
+.container{max-width:1100px;margin:0 auto;padding:0 32px}
+.hero{padding:48px 0 32px;text-align:center}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;color:#3a3028;letter-spacing:0.04em;margin-bottom:8px}
+.hero p{font-family:'Cormorant Garamond',serif;font-style:italic;color:#8a7a6e;font-size:17px;margin-bottom:28px}
+.search-wrap{max-width:620px;margin:0 auto;display:flex;align-items:center;background:#fff;border:1px solid #e6ddd2;border-radius:3px;box-shadow:0 2px 10px rgba(58,48,40,0.04)}
+.search-wrap input{flex:1;border:none;outline:none;font-size:14px;padding:14px 12px;background:transparent}
+.search-icon{margin:0 14px;color:#b5a494;flex-shrink:0}
+.filters{background:#fff;border:1px solid #e6ddd2;border-radius:4px;padding:14px 16px;margin:20px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:9px;font-weight:700;letter-spacing:0.1em;color:#c0b0a4;text-transform:uppercase}
+.fg select{font-size:11px;padding:5px 8px;border:1px solid #e6ddd2;border-radius:3px;background:#fff;cursor:pointer;outline:none}
+.fg select.on{border-color:#c0a070;background:#f2ede5;font-weight:600;color:#3a3028}
+.stats{margin-left:auto;font-size:11px;color:#c0b0a4;align-self:center}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;margin-top:28px}
+.sec-tag{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c0a070;padding:4px 12px;border-radius:2px;background:#fdf8f0;color:#9a7a50}
+.sec-tag.partial{border-color:#e6ddd2;background:#fff;color:#6a5a4e}
+.sec-sub{font-size:11px;color:#9a8a7e;font-style:italic}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:32px}
+.card{background:#fff;border:1px solid #e6ddd2;border-radius:4px;overflow:hidden}
+.thumb{background:#f2ede5;height:160px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;border-bottom:1px solid #efe9e0;overflow:hidden}
+.thumb:hover{opacity:0.85}
+.play{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.75);border:1.5px solid #b5a494;display:flex;align-items:center;justify-content:center}
+.tobadge{position:absolute;top:7px;right:7px;background:rgba(245,240,230,0.9);border:1px solid #e6ddd2;border-radius:2px;padding:2px 7px;font-size:8px;color:#b5a494;letter-spacing:0.08em;text-transform:uppercase}
+.phint{position:absolute;bottom:7px;left:9px;font-size:9px;color:#c0b0a4}
+.cb{padding:12px 14px 11px}
+.ct{font-size:12.5px;font-weight:600;color:#3a3028;margin-bottom:3px;line-height:1.4}
+.cf{display:flex;align-items:center;gap:4px;font-size:10px;color:#9a8a7e;font-style:italic;margin-bottom:7px}
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.badge{font-size:8.5px;padding:1px 7px;border-radius:20px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;border:1px solid}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
+.pill{font-size:9px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pill.hit{background:#eef5ee;color:#4a7a50;border:1px solid #b0d0b8}
+.pill.miss{background:#fdf0ee;color:#9a5040;border:1px solid #e0b8b0}
+.actions{display:flex;gap:5px;flex-wrap:wrap;padding-top:9px;border-top:1px solid #efe9e0}
+.btn{border-radius:3px;padding:5px 10px;font-size:10.5px;font-weight:600;cursor:pointer;letter-spacing:0.03em;border:1px solid #e6ddd2;background:#fdf8f0;color:#9a7a50}
+.btn2{background:#f2ede5;color:#3a3028;border:1px solid #e6ddd2;border-radius:3px;padding:5px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.btn3{background:none;color:#9a8a7e;border:1px solid #efe9e0;border-radius:3px;padding:5px 10px;font-size:10.5px;text-decoration:none;display:inline-block}
+.empty{text-align:center;padding:60px 20px}
+.empty h2{font-family:'Cormorant Garamond',serif;font-size:28px;color:#b5a494;font-style:italic;margin-bottom:8px}
+.footer{border-top:1px solid #e6ddd2;background:#fff;padding:14px 40px;display:flex;justify-content:space-between;margin-top:40px}
+.divider{height:1px;background:#e6ddd2;margin:8px 0 28px}
+.loading{text-align:center;padding:80px 20px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#b5a494;font-style:italic}
+</style>
+</head>
+<body>
+
+<div id="gate" style="position:fixed;inset:0;background:#faf8f5;z-index:9999;display:flex;align-items:center;justify-content:center">
+  <div style="text-align:center;width:100%;max-width:360px;padding:0 24px">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:0.18em;text-transform:uppercase;color:#3a3028;margin-bottom:6px">Calily</div>
+    <div style="font-size:9px;letter-spacing:0.2em;color:#b5a494;text-transform:uppercase;margin-bottom:40px">Video Archive &mdash; Internal Tool</div>
+    <div style="background:#fff;border:1px solid #e6ddd2;border-radius:4px;padding:32px 28px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#3a3028;margin-bottom:6px">Team Access</div>
+      <div style="font-size:11px;color:#9a8a7e;margin-bottom:24px">Enter your password to continue</div>
+      <input id="pw-input" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()"
+        style="width:100%;border:1px solid #e6ddd2;border-radius:3px;padding:11px 14px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif;color:#3a3028;background:#faf8f5;margin-bottom:10px"/>
+      <div id="pw-err" style="font-size:11px;color:#c05040;min-height:16px;margin-bottom:10px"></div>
+      <button onclick="checkPw()" style="width:100%;background:#3a3028;color:#faf8f5;border:none;border-radius:3px;padding:12px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif">Enter Archive</button>
+    </div>
+    <div style="font-size:9px;color:#c0b0a4;margin-top:20px;letter-spacing:0.08em">Calily Bridal &mdash; Confidential</div>
+  </div>
+</div>
+
+<script>
+function checkPw() {
+  var val = document.getElementById('pw-input').value;
+  if(val === 'calily2026!88') {
+    document.getElementById('gate').style.display = 'none';
+    sessionStorage.setItem('calily_auth','1');
+  } else {
+    document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+// Auto-unlock if already authenticated this session
+if(sessionStorage.getItem('calily_auth')==='1') {
+  document.addEventListener('DOMContentLoaded', function(){ document.getElementById('gate').style.display='none'; });
+}
+</script>
+
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="logo">Calily</span>
+    <span style="font-size:9px;letter-spacing:0.16em;color:#b5a494;text-transform:uppercase">Video Archive</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span style="font-size:11px;color:#9a8a7e"><span id="total-count" style="color:#9a7a50;font-weight:600">...</span> videos</span>
+    <span style="font-size:9px;color:#c0b0a4;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #efe9e0;padding:3px 10px;border-radius:2px">Internal Tool</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>Find the perfect shot</h1>
+    <p>Search by name, model, product or scene &mdash; copy the link straight into your script</p>
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search by name, product, model, scene..." oninput="onSearch()"/>
+    </div>
+    <div id="suggestions" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px"></div>
+  </div>
+  <div class="filters" id="filters-bar"></div>
+  <div id="results"><div class="loading">Loading archive...</div></div>
+</div>
+
+<div class="footer">
+  <span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:#9a8a7e;letter-spacing:0.08em">Calily Bridal &mdash; Internal Asset Library</span>
+  <span style="font-size:10px;color:#c0b0a4;letter-spacing:0.06em;text-transform:uppercase">Powered by Gemini AI</span>
+</div>
+
+<script>
+var FILTER_OPTS = {
+  who:    ['ALL','LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE','OTHER/NA'],
+  product:['ALL','OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE','CLASSIC PEARL DROP','PEARL HOOP DROP','CRYSTAL TEARDROP','THREE PEARL DROP','LARGE PEARL HOOP','PEARL CHAIN','BEATRICE HAIRPIN','GISELLE HAIRPIN','LINNEA','JASMINE HAIRPIN','MIRABELLA HAIRPIN','ROSALIA CHOKER','FLORENCE CHOKER','OTHER/NA'],
+  format: ['ALL','BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE'],
+  action: ['ALL','MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING','OTHER/NA'],
+  shot:    ['ALL','CLOSEUP','PANOVER'],
+  mood:    ['ALL','elegant','joyful','intimate','celebratory','romantic','peaceful','energetic'],
+  setting: ['ALL','HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR','OTHER/NA'],
+  folder:  ['ALL']
+};
+
+var state = {query:'', filters:{who:'ALL',product:'ALL',format:'ALL',action:'ALL',shot:'ALL',mood:'ALL',setting:'ALL',folder:'ALL'}};
+
+function infer(v) {
+  var fn=(v.filename||'').toLowerCase(), all=fn+' '+(v.description||'').toLowerCase()+' '+(v.transcript||'').toLowerCase();
+  var who='OTHER/NA';
+  ['lillie','karolina','stefania','gemma','margo','emilia','emma','bride'].forEach(function(n){if(who==='OTHER/NA'&&all.indexOf(n)>=0)who=n.toUpperCase();});
+  var format='BROLL';
+  if(all.indexOf('testimonial')>=0)format='TESTIMONIAL';
+  else if(all.indexOf('ugc')>=0)format='UGC';
+  else if(all.indexOf('montage')>=0)format='MONTAGE';
+  var action='OTHER/NA';
+  var acts=[['modelling','MODELLING'],['modeling','MODELLING'],['wearing','MODELLING'],['styling','STYLING'],['adjusting','STYLING'],['talking','TALKING'],['describing','TALKING'],['shooting','SHOOTING'],['sewing','SEWING'],['cutting','CUTTING'],['unbox','UNBOXING'],['comparing','COMPARING'],['walking','SHOWING'],['showing','SHOWING']];
+  for(var i=0;i<acts.length;i++){if(fn.indexOf(acts[i][0])>=0){action=acts[i][1];break;}}
+  var shot='OTHER/NA';
+  if(all.indexOf('closeup')>=0||all.indexOf('close-up')>=0||all.indexOf('close up')>=0)shot='CLOSEUP';
+  else if(all.indexOf('pan')>=0)shot='PANOVER';
+  var plist=['ophelia','juliette','daphne','sera','celestine','mia','tessa','audrey','marina','talia','eden','lucine','athena','rosalia','flora','alessia','jesse','ava','aria','blair','siena','freya','cleo','vivienne','aurora','luna','camellia','arabella','margaux','estelle','classic pearl drop','pearl hoop drop','crystal teardrop','three pearl drop','large pearl hoop','pearl chain','beatrice hairpin','giselle hairpin','linnea','jasmine hairpin','mirabella hairpin','rosalia choker','florence choker'];
+  var product='OTHER/NA';
+  for(var j=0;j<plist.length;j++){if(fn.indexOf(plist[j])>=0||(v.transcript||'').toLowerCase().indexOf(plist[j])>=0){product=plist[j].toUpperCase();break;}}
+  var setting='OTHER/NA';
+  var folder=(v.folder||'').toLowerCase();
+  if(all.indexOf('studio')>=0||folder.indexOf('studio')>=0) setting='STUDIO';
+  else if(all.indexOf('beach')>=0||all.indexOf('ocean')>=0||all.indexOf('sand')>=0) setting='BEACH';
+  else if(all.indexOf('factory')>=0||folder.indexOf('china')>=0||folder.indexOf('cmm')>=0) setting='FACTORY';
+  else if(all.indexOf('warehouse')>=0||folder.indexOf('warehouse')>=0) setting='WAREHOUSE';
+  else if(all.indexOf('bridal shop')>=0||all.indexOf('bridalshop')>=0) setting='BRIDALSHOP';
+  else if(all.indexOf('wedding')>=0||all.indexOf('ceremony')>=0||folder.indexOf('wedding')>=0) setting='WEDDING';
+  else if(all.indexOf('exhibition')>=0||all.indexOf('expo')>=0) setting='EXHIBITION';
+  else if(all.indexOf('car')>=0||all.indexOf('airport')>=0||all.indexOf('taxi')>=0) setting='CAR';
+  else if(all.indexOf('home')>=0||all.indexOf('house')>=0||all.indexOf('apartment')>=0) setting='HOME';
+  else if(folder.indexOf('bali')>=0||folder.indexOf('sydney park')>=0||folder.indexOf('park')>=0) setting='STUDIO';
+  return {who:who,format:format,action:action,shot:shot,product:product,setting:setting};
+}
+
+function passes(v) {
+  var f=state.filters, inf=infer(v);
+  if(f.folder!=='ALL'&&v.folder!==f.folder)return false;
+  if(f.who!=='ALL'&&inf.who!==f.who)return false;
+  if(f.format!=='ALL'&&inf.format!==f.format)return false;
+  if(f.action!=='ALL'&&inf.action!==f.action)return false;
+  if(f.shot!=='ALL'&&inf.shot!==f.shot)return false;
+  if(f.mood!=='ALL'&&(v.mood||'').toLowerCase()!==f.mood)return false;
+  if(f.setting!=='ALL'&&inf.setting!==f.setting)return false;
+  if(f.product!=='ALL'){var p=f.product.toLowerCase(),fn=v.filename.toLowerCase();if(fn.indexOf(p)<0&&(v.transcript||'').toLowerCase().indexOf(p)<0)return false;}
+  return true;
+}
+
+function score(v,q) {
+  if(!q)return 1;
+  var words=q.toLowerCase().split(' ').filter(function(w){return w.length>1;});
+  var fn=v.filename.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ').toLowerCase();
+  var s=0;
+  words.forEach(function(w){
+    if(fn.indexOf(w)>=0)s+=5;
+    if((v.tags||[]).join(' ').toLowerCase().indexOf(w)>=0)s+=4;
+    if((v.description||'').toLowerCase().indexOf(w)>=0)s+=2;
+    if((v.folder||'').toLowerCase().indexOf(w)>=0)s+=2;
+  });
+  if(fn.indexOf(q.toLowerCase())>=0)s+=8;
+  return s;
+}
+
+function allMatch(v,words) {
+  var fn=v.filename.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ').toLowerCase();
+  var all=[fn,(v.tags||[]).join(' '),(v.description||''),(v.folder||'')].join(' ').toLowerCase();
+  return words.every(function(w){return all.indexOf(w)>=0;});
+}
+
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function hl(text) {
+  if(!state.query.trim())return esc(text);
+  var words=state.query.toLowerCase().split(' ').filter(function(w){return w.length>1;});
+  var r=esc(text);
+  words.forEach(function(w){r=r.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');});
+  return r;
+}
+
+var cid=0;
+function cardHTML(v) {
+  var id='c'+(cid++);
+  var inf=infer(v);
+  var fn=v.filename.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');
+  var link='https://drive.google.com/file/d/'+v.driveId+'/view?usp=sharing';
+  var scriptText='[SHOT: '+fn.toUpperCase()+']\nLink: '+link;
+  var words=state.query.toLowerCase().split(' ').filter(function(w){return w.length>1;});
+  var allText=[fn.toLowerCase(),(v.tags||[]).join(' '),(v.description||''),(v.folder||'')].join(' ').toLowerCase();
+  var matched=words.filter(function(w){return allText.indexOf(w)>=0;});
+  var missing=words.filter(function(w){return allText.indexOf(w)<0;});
+  var bc={who:'background:#f0f5f0;color:#406040;border-color:#b0d0b0',action:'background:#fdf8f0;color:#806030;border-color:#e0c890',shot:'background:#f5f0f8;color:#604870;border-color:#d0b8e0',format:'background:#f0f0f8;color:#404060;border-color:#c0c0dc',product:'background:#fdf0f8;color:#7a3860;border-color:#e0b0d0',setting:'background:#f0f8f5;color:#306050;border-color:#a0d0c0'};
+  var badges='';
+  if(inf.format!=='BROLL'&&inf.format!=='OTHER/NA')badges+='<span class="badge" style="'+bc.format+'">'+inf.format+'</span>';
+  if(inf.who!=='OTHER/NA')badges+='<span class="badge" style="'+bc.who+'">'+inf.who+'</span>';
+  if(inf.setting!=='OTHER/NA')badges+='<span class="badge" style="'+bc.setting+'">'+inf.setting+'</span>';
+  if(inf.action!=='OTHER/NA')badges+='<span class="badge" style="'+bc.action+'">'+inf.action+'</span>';
+  if(inf.shot!=='OTHER/NA')badges+='<span class="badge" style="'+bc.shot+'">'+inf.shot+'</span>';
+  if(inf.product!=='OTHER/NA')badges+='<span class="badge" style="'+bc.product+'">'+inf.product+'</span>';
+  var pills=matched.map(function(w){return '<span class="pill hit">&#10003; '+esc(w)+'</span>';}).join('')+missing.map(function(w){return '<span class="pill miss">&#10007; '+esc(w)+'</span>';}).join('');
+  var lnkEsc=link.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var scrEsc=JSON.stringify(scriptText);
+  return '<div class="card">'+
+  var thumbUrl='https://drive.google.com/thumbnail?id='+v.driveId+'&sz=w400';
+  return '<div class="card">'+
+    '<div class="thumb" onclick="window.open(\''+lnkEsc+'\',\'_blank\')" style="cursor:pointer">'+
+      '<img src="'+thumbUrl+'" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>'+
+      '<div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;background:#f2ede5"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b5a494" stroke-width="1.2"><polygon points="5,3 19,12 5,21"/></svg></div>'+
+    '<div class="cb">'+
+      '<div class="ct">'+hl(fn)+'</div>'+
+      (v.folder?'<div class="cf"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b5a494" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>'+esc(v.folder)+'</div>':'')+
+      (badges?'<div class="badges">'+badges+'</div>':'')+
+      (v.description?'<div style="font-size:11px;color:#6a5a4e;line-height:1.6;margin-bottom:6px">'+hl(v.description.substring(0,200))+(v.description.length>200?'...':'')+"</div>":'')+ 
+      (v.mood?'<span style="font-size:9.5px;padding:2px 8px;border-radius:20px;background:#f5f0f8;color:#604878;border:1px solid #d0b8e0;display:inline-block;margin-bottom:8px;text-transform:capitalize">'+esc(v.mood)+'</span>':'')+
+      (pills?'<div class="pills">'+pills+'</div>':'')+
+      '<div class="actions">'+
+        '<button id="'+id+'a" class="btn" onclick="cp(\''+lnkEsc+'\',\''+id+'a\')">&#128279; Copy Link</button>'+
+        '<a href="'+lnkEsc+'" target="_blank" class="btn3">&#8599; Open in Drive</a>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function cp(text,btnId){
+  navigator.clipboard.writeText(text).then(function(){
+    var b=document.getElementById(btnId);if(!b)return;
+    var orig=b.textContent;b.textContent='Copied!';b.style.color='#4a7a50';
+    setTimeout(function(){b.textContent=orig;b.style.color='';},2000);
+  });
+}
+
+function section(vids,label,sub,isExact) {
+  if(!vids.length)return '';
+  cid=0;
+  return '<div class="sec-head"><span class="sec-tag'+(isExact?'':' partial')+'">'+(isExact?'&#10022; ':'')+label+' &mdash; '+vids.length+' clip'+(vids.length!==1?'s':'')+'</span><span class="sec-sub">'+sub+'</span></div><div class="grid">'+vids.map(cardHTML).join('')+'</div>';
+}
+
+function onSearch(){state.query=document.getElementById('search').value;run();}
+function setFilter(k,v){state.filters[k]=v;var s=document.getElementById('f-'+k);if(s)s.className=v!=='ALL'?'on':'';run();}
+function clearFilters(){Object.keys(state.filters).forEach(function(k){state.filters[k]='ALL';});document.querySelectorAll('.fg select').forEach(function(s){s.value='ALL';s.className='';});run();}
+
+function run(){
+  var q=state.query.trim();
+  var pool=window.CALILY_VIDEOS.filter(passes);
+  var el=document.getElementById('results');
+  var hasFilters=Object.values(state.filters).some(function(v){return v!=='ALL';});
+  if(!q&&!hasFilters){
+    document.getElementById('stats').textContent=window.CALILY_VIDEOS.length+' total videos';
+    el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:8px 0 40px">'+
+      [['&#128269;','Search naturally','Type a name, product, model or scene'],['&#128203;','Copy for your script','Paste a formatted shot reference into your brief'],['&#128279;','Share the Drive link','Send the exact Drive file to your editors instantly']]
+      .map(function(x){return '<div style="background:#fff;border:1px solid #e6ddd2;border-radius:4px;padding:20px"><div style="font-size:20px;margin-bottom:8px">'+x[0]+'</div><div style="font-size:13px;font-weight:600;color:#3a3028;margin-bottom:5px">'+x[1]+'</div><div style="font-size:12px;color:#6a5a4e;line-height:1.6">'+x[2]+'</div></div>';}).join('')+'</div>';
+    return;
+  }
+  var words=q?q.toLowerCase().split(' ').filter(function(w){return w.length>1;}):[];
+  var scored=pool.map(function(v){return{v:v,s:score(v,q)};}).filter(function(x){return !q||x.s>0;}).sort(function(a,b){return b.s-a.s;});
+  var exact=scored.filter(function(x){return !words.length||allMatch(x.v,words);}).map(function(x){return x.v;});
+  var related=scored.filter(function(x){return words.length&&!allMatch(x.v,words);}).map(function(x){return x.v;});
+  var total=exact.length+related.length;
+  document.getElementById('stats').textContent=total+' result'+(total!==1?'s':'');
+  if(!total){el.innerHTML='<div class="empty"><h2>No clips found</h2><p style="font-size:12px;color:#9a8a7e">Try different keywords or clear some filters</p></div>';return;}
+  el.innerHTML=section(exact,'Best matches','All search words found',true)+(related.length?'<div class="divider"></div>':'')+section(related,'Partial matches','Some words found',false);
+}
+
+function buildFilters(){
+  var defs=[{k:'who',l:'Who'},{k:'product',l:'Product'},{k:'folder',l:'Folder'},{k:'format',l:'Format'},{k:'setting',l:'Setting'},{k:'action',l:'Action'},{k:'shot',l:'Shot'},{k:'mood',l:'Mood'}];
+  var html=defs.map(function(d){
+    return '<div class="fg"><label>'+d.l+'</label><select id="f-'+d.k+'" onchange="setFilter(\''+d.k+'\',this.value)">'+(FILTER_OPTS[d.k]||[]).map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select></div>';
+  }).join('');
+  html+='<div class="stats"><span id="stats">...</span></div><button onclick="clearFilters()" class="btn3" style="font-size:10px;padding:4px 10px">&#10005; Clear</button>';
+  document.getElementById('filters-bar').innerHTML=html;
+}
+
+function buildSuggestions(){
+  var s=['Lillie veil studio','Emilia modeling','Freya veil','Karolina','closeup','Bali shoot','China factory'];
+  document.getElementById('suggestions').innerHTML=s.map(function(t){
+    return '<button onclick="document.getElementById(\'search\').value=\''+t+'\';state.query=\''+t+'\';run()" style="background:#fff;border:1px solid #e6ddd2;color:#6a5a4e;border-radius:20px;padding:5px 14px;font-size:11px;cursor:pointer">'+t+'</button>';
+  }).join('');
+}
+
+function init(){
+  var fs={};
+  window.CALILY_VIDEOS.forEach(function(v){if(v.folder)fs[v.folder]=1;});
+  FILTER_OPTS.folder=['ALL'].concat(Object.keys(fs).sort());
+  document.getElementById('total-count').textContent=window.CALILY_VIDEOS.length;
+  buildFilters();
+  buildSuggestions();
+  run();
+}
+</script>
+
+<script src="data.js" onload="init()" onerror="document.getElementById('results').innerHTML='<div class=\'loading\' style=\'color:#c04040\'>Error: data.js not found. Make sure both files are uploaded to GitHub.</div>'"></script>
+
+</body>
+</html>
