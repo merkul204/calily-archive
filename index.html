@@ -268,10 +268,45 @@ function cp(text,btnId){
   });
 }
 
-function section(vids,label,sub,isExact) {
-  if(!vids.length)return '';
-  cid=0;
-  return '<div class="sec-head"><span class="sec-tag'+(isExact?'':' partial')+'">'+(isExact?'&#10022; ':'')+label+' &mdash; '+vids.length+' clip'+(vids.length!==1?'s':'')+'</span><span class="sec-sub">'+sub+'</span></div><div class="grid">'+vids.map(cardHTML).join('')+'</div>';
+var PAGE_SIZE = 30;
+var _exact = [], _related = [], _shownExact = 0, _shownRelated = 0;
+
+function renderGrid(vids, from, count) {
+  return vids.slice(from, from + count).map(cardHTML).join('');
+}
+
+function section(vids, label, sub, isExact) {
+  if (!vids.length) return '';
+  return '<div class="sec-head"><span class="sec-tag' + (isExact ? '' : ' partial') + '">' + (isExact ? '&#10022; ' : '') + label + ' &mdash; ' + vids.length + ' clip' + (vids.length !== 1 ? 's' : '') + '</span><span class="sec-sub">' + sub + '</span></div><div class="grid" id="grid-' + (isExact ? 'exact' : 'related') + '">' + renderGrid(vids, 0, PAGE_SIZE) + '</div>';
+}
+
+function loadMoreExact() {
+  _shownExact = Math.min(_shownExact + PAGE_SIZE, _exact.length);
+  var g = document.getElementById('grid-exact');
+  if (g) g.innerHTML = renderGrid(_exact, 0, _shownExact);
+  updateLoadMore();
+}
+
+function loadMoreRelated() {
+  _shownRelated = Math.min(_shownRelated + PAGE_SIZE, _related.length);
+  var g = document.getElementById('grid-related');
+  if (g) g.innerHTML = renderGrid(_related, 0, _shownRelated);
+  updateLoadMore();
+}
+
+function updateLoadMore() {
+  var eb = document.getElementById('load-more-exact');
+  var rb = document.getElementById('load-more-related');
+  if (eb) {
+    var rem = _exact.length - _shownExact;
+    if (rem > 0) { eb.style.display = 'block'; eb.textContent = 'Load ' + Math.min(rem, PAGE_SIZE) + ' more best matches (' + rem + ' remaining)'; }
+    else eb.style.display = 'none';
+  }
+  if (rb) {
+    var rem2 = _related.length - _shownRelated;
+    if (rem2 > 0) { rb.style.display = 'block'; rb.textContent = 'Load ' + Math.min(rem2, PAGE_SIZE) + ' more partial matches (' + rem2 + ' remaining)'; }
+    else rb.style.display = 'none';
+  }
 }
 
 function onSearch(){state.query=document.getElementById('search').value;run();}
@@ -279,6 +314,7 @@ function setFilter(k,v){state.filters[k]=v;var s=document.getElementById('f-'+k)
 function clearFilters(){Object.keys(state.filters).forEach(function(k){state.filters[k]='ALL';});document.querySelectorAll('.fg select').forEach(function(s){s.value='ALL';s.className='';});run();}
 
 function run(){
+  cid = 0;
   var q=state.query.trim();
   var pool=window.CALILY_VIDEOS.filter(passes);
   var el=document.getElementById('results');
@@ -286,18 +322,33 @@ function run(){
   if(!q&&!hasFilters){
     document.getElementById('stats').textContent=window.CALILY_VIDEOS.length+' total videos';
     el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:8px 0 40px">'+
-      [['&#128269;','Search naturally','Type a name, product, model or scene'],['&#128203;','Copy for your script','Paste a formatted shot reference into your brief'],['&#128279;','Share the Drive link','Send the exact Drive file to your editors instantly']]
+      [['&#128269;','Search naturally','Type a name, product, model or scene'],['&#128203;','Copy for your brief','Find the perfect clip and grab the Drive link'],['&#128279;','Share with editors','Send the exact Drive file link directly']]
       .map(function(x){return '<div style="background:#fff;border:1px solid #e6ddd2;border-radius:4px;padding:20px"><div style="font-size:20px;margin-bottom:8px">'+x[0]+'</div><div style="font-size:13px;font-weight:600;color:#3a3028;margin-bottom:5px">'+x[1]+'</div><div style="font-size:12px;color:#6a5a4e;line-height:1.6">'+x[2]+'</div></div>';}).join('')+'</div>';
     return;
   }
   var words=q?q.toLowerCase().split(' ').filter(function(w){return w.length>1;}):[];
   var scored=pool.map(function(v){return{v:v,s:score(v,q)};}).filter(function(x){return !q||x.s>0;}).sort(function(a,b){return b.s-a.s;});
-  var exact=scored.filter(function(x){return !words.length||allMatch(x.v,words);}).map(function(x){return x.v;});
-  var related=scored.filter(function(x){return words.length&&!allMatch(x.v,words);}).map(function(x){return x.v;});
-  var total=exact.length+related.length;
+  _exact=scored.filter(function(x){return !words.length||allMatch(x.v,words);}).map(function(x){return x.v;});
+  _related=scored.filter(function(x){return words.length&&!allMatch(x.v,words);}).map(function(x){return x.v;});
+  _shownExact=Math.min(PAGE_SIZE,_exact.length);
+  _shownRelated=Math.min(PAGE_SIZE,_related.length);
+  var total=_exact.length+_related.length;
   document.getElementById('stats').textContent=total+' result'+(total!==1?'s':'');
   if(!total){el.innerHTML='<div class="empty"><h2>No clips found</h2><p style="font-size:12px;color:#9a8a7e">Try different keywords or clear some filters</p></div>';return;}
-  el.innerHTML=section(exact,'Best matches','All search words found',true)+(related.length?'<div class="divider"></div>':'')+section(related,'Partial matches','Some words found',false);
+  var html='';
+  if(_exact.length){
+    html+='<div class="sec-head"><span class="sec-tag">&#10022; Best matches &mdash; '+_exact.length+' clip'+(_exact.length!==1?'s':'')+'</span><span class="sec-sub">All search words found</span></div>';
+    html+='<div class="grid" id="grid-exact">'+renderGrid(_exact,0,_shownExact)+'</div>';
+    html+='<div id="load-more-exact" onclick="loadMoreExact()" style="display:none;text-align:center;margin:16px 0 8px;padding:10px 24px;background:#fff;border:1px solid #e6ddd2;border-radius:3px;cursor:pointer;font-size:11px;color:#6a5a4e;letter-spacing:0.04em"></div>';
+  }
+  if(_related.length){
+    html+=(_exact.length?'<div class="divider"></div>':'');
+    html+='<div class="sec-head"><span class="sec-tag partial">Partial matches &mdash; '+_related.length+' clip'+(_related.length!==1?'s':'')+'</span><span class="sec-sub">Some words found</span></div>';
+    html+='<div class="grid" id="grid-related">'+renderGrid(_related,0,_shownRelated)+'</div>';
+    html+='<div id="load-more-related" onclick="loadMoreRelated()" style="display:none;text-align:center;margin:16px 0 8px;padding:10px 24px;background:#fff;border:1px solid #e6ddd2;border-radius:3px;cursor:pointer;font-size:11px;color:#6a5a4e;letter-spacing:0.04em"></div>';
+  }
+  el.innerHTML=html;
+  updateLoadMore();
 }
 
 function buildFilters(){
