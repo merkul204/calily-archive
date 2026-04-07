@@ -127,8 +127,19 @@ if(sessionStorage.getItem('calily_auth')==='1') {
 </div>
 
 <script>
-var _cfg = {};
-var FILTER_OPTS = {who:[],product:[],format:[],action:[],shot:[],mood:[],setting:[],folder:['ALL']};
+// FILTER_OPTS — driven by config.js. Falls back to hardcoded if config not loaded.
+var _cfg = window.CALILY_CONFIG || {};
+var FILTER_OPTS = {
+  who:     ['ALL'].concat(_cfg.who     || ['LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE']).concat(['OTHER/NA']),
+  product: ['ALL'].concat(_cfg.products|| ['OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE']).concat(['OTHER/NA']),
+  format:  ['ALL'].concat(_cfg.formats  || ['BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE']),
+  action:  ['ALL'].concat(Object.keys(_cfg.actions||{}).length ? Object.keys(_cfg.actions) : ['MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING']).concat(['OTHER/NA']),
+  shot:    ['ALL'].concat(_cfg.shots    || ['CLOSEUP','PANOVER']),
+  mood:    ['ALL'].concat(_cfg.moods    || ['elegant','joyful','intimate','celebratory','romantic','peaceful','energetic']),
+  setting: ['ALL'].concat(Object.keys(_cfg.settings||{}).length ? Object.keys(_cfg.settings) : ['HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR']).concat(['OTHER/NA']),
+  folder:  ['ALL']
+};
+
 var state = {query:'', filters:{who:'ALL',product:'ALL',format:'ALL',action:'ALL',shot:'ALL',mood:'ALL',setting:'ALL',folder:'ALL'}};
 
 function infer(v) {
@@ -292,15 +303,6 @@ function run(){
 }
 
 function buildFilters(){
-  // Re-read config here — guaranteed to be loaded since init() fires after config.js + data.js
-  var _cfg = window.CALILY_CONFIG || {};
-  FILTER_OPTS.who     = ['ALL'].concat(_cfg.who      || ['LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE']).concat(['OTHER/NA']);
-  FILTER_OPTS.product = ['ALL'].concat(_cfg.products || ['OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE']).concat(['OTHER/NA']);
-  FILTER_OPTS.format  = ['ALL'].concat(_cfg.formats   || ['BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE']);
-  FILTER_OPTS.action  = ['ALL'].concat(Object.keys(_cfg.actions||{}).length ? Object.keys(_cfg.actions) : ['MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING']).concat(['OTHER/NA']);
-  FILTER_OPTS.shot    = ['ALL'].concat(_cfg.shots     || ['CLOSEUP','PANOVER']);
-  FILTER_OPTS.mood    = ['ALL'].concat(_cfg.moods     || ['elegant','joyful','intimate','celebratory','romantic','peaceful','energetic']);
-  FILTER_OPTS.setting = ['ALL'].concat(Object.keys(_cfg.settings||{}).length ? Object.keys(_cfg.settings) : ['HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR']).concat(['OTHER/NA']);
   var defs=[{k:'who',l:'Who'},{k:'product',l:'Product'},{k:'folder',l:'Folder'},{k:'format',l:'Format'},{k:'setting',l:'Setting'},{k:'action',l:'Action'},{k:'shot',l:'Shot'},{k:'mood',l:'Mood'}];
   var html=defs.map(function(d){
     return '<div class="fg"><label>'+d.l+'</label><select id="f-'+d.k+'" onchange="setFilter(\''+d.k+'\',this.value)">'+(FILTER_OPTS[d.k]||[]).map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select></div>';
