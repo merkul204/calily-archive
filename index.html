@@ -32,9 +32,9 @@ mark{background:rgba(192,160,112,0.2);color:#9a7a50;border-radius:2px;padding:0 
 .sec-tag{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c0a070;padding:4px 12px;border-radius:2px;background:#fdf8f0;color:#9a7a50}
 .sec-tag.partial{border-color:#e6ddd2;background:#fff;color:#6a5a4e}
 .sec-sub{font-size:11px;color:#9a8a7e;font-style:italic}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:32px}
 .card{background:#fff;border:1px solid #e6ddd2;border-radius:4px;overflow:hidden}
-.thumb{background:#f2ede5;height:275px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;border-bottom:1px solid #efe9e0;overflow:hidden}
+.thumb{background:linear-gradient(150deg,#f2ede5,#ede5d8);height:110px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;border-bottom:1px solid #efe9e0}
 .thumb:hover{opacity:0.85}
 .play{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.75);border:1.5px solid #b5a494;display:flex;align-items:center;justify-content:center}
 .tobadge{position:absolute;top:7px;right:7px;background:rgba(245,240,230,0.9);border:1px solid #e6ddd2;border-radius:2px;padding:2px 7px;font-size:8px;color:#b5a494;letter-spacing:0.08em;text-transform:uppercase}
@@ -80,7 +80,7 @@ mark{background:rgba(192,160,112,0.2);color:#9a7a50;border-radius:2px;padding:0 
 <script>
 function checkPw() {
   var val = document.getElementById('pw-input').value;
-  if(val === 'calily2026!88') {
+  if(val === (window.CALILY_CONFIG&&window.CALILY_CONFIG.password||'calily2026!88')) {
     document.getElementById('gate').style.display = 'none';
     sessionStorage.setItem('calily_auth','1');
   } else {
@@ -127,17 +127,8 @@ if(sessionStorage.getItem('calily_auth')==='1') {
 </div>
 
 <script>
-var FILTER_OPTS = {
-  who:    ['ALL','LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE','OTHER/NA'],
-  product:['ALL','OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE','CLASSIC PEARL DROP','PEARL HOOP DROP','CRYSTAL TEARDROP','THREE PEARL DROP','LARGE PEARL HOOP','PEARL CHAIN','BEATRICE HAIRPIN','GISELLE HAIRPIN','LINNEA','JASMINE HAIRPIN','MIRABELLA HAIRPIN','ROSALIA CHOKER','FLORENCE CHOKER','OTHER/NA'],
-  format: ['ALL','BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE'],
-  action: ['ALL','MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING','OTHER/NA'],
-  shot:    ['ALL','CLOSEUP','PANOVER'],
-  mood:    ['ALL','elegant','joyful','intimate','celebratory','romantic','peaceful','energetic'],
-  setting: ['ALL','HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR','OTHER/NA'],
-  folder:  ['ALL']
-};
-
+var _cfg = {};
+var FILTER_OPTS = {who:[],product:[],format:[],action:[],shot:[],mood:[],setting:[],folder:['ALL']};
 var state = {query:'', filters:{who:'ALL',product:'ALL',format:'ALL',action:'ALL',shot:'ALL',mood:'ALL',setting:'ALL',folder:'ALL'}};
 
 function infer(v) {
@@ -238,23 +229,23 @@ function cardHTML(v) {
   var pills=matched.map(function(w){return '<span class="pill hit">&#10003; '+esc(w)+'</span>';}).join('')+missing.map(function(w){return '<span class="pill miss">&#10007; '+esc(w)+'</span>';}).join('');
   var lnkEsc=link.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var scrEsc=JSON.stringify(scriptText);
-  var thumbUrl='https://drive.google.com/thumbnail?id='+v.driveId+'&sz=w400';
   return '<div class="card">'+
-    '<div class="thumb" onclick="window.open(\''+lnkEsc+'\',\'_blank\')" style="cursor:pointer">'+
-      '<img src="'+thumbUrl+'" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>'+
-      '<div style="display:none;width:100%;height:100%;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b5a494" stroke-width="1.2"><polygon points="5,3 19,12 5,21"/></svg></div>'+
+    '<div class="thumb" onclick="window.open(\''+lnkEsc+'\',\'_blank\')">'+
+      '<div class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#8a7a6e"><polygon points="6,4 20,12 6,20"/></svg></div>'+
       (v.title_only?'<span class="tobadge">title only</span>':'')+
+      '<span class="phint">click to preview &#8599;</span>'+
     '</div>'+
     '<div class="cb">'+
       '<div class="ct">'+hl(fn)+'</div>'+
       (v.folder?'<div class="cf"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b5a494" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>'+esc(v.folder)+'</div>':'')+
       (badges?'<div class="badges">'+badges+'</div>':'')+
-      (v.description?'<div style="font-size:11px;color:#6a5a4e;line-height:1.6;margin-bottom:6px">'+hl(v.description.substring(0,200))+(v.description.length>200?'...':'')+"</div>":'')+
+      (v.description?'<div style="font-size:11px;color:#6a5a4e;line-height:1.5;margin-bottom:8px">'+hl(v.description.substring(0,110))+'...</div>':'')+
       (v.mood?'<span style="font-size:9.5px;padding:2px 8px;border-radius:20px;background:#f5f0f8;color:#604878;border:1px solid #d0b8e0;display:inline-block;margin-bottom:8px;text-transform:capitalize">'+esc(v.mood)+'</span>':'')+
       (pills?'<div class="pills">'+pills+'</div>':'')+
       '<div class="actions">'+
         '<button id="'+id+'a" class="btn" onclick="cp(\''+lnkEsc+'\',\''+id+'a\')">&#128279; Copy Link</button>'+
-        '<a href="'+lnkEsc+'" target="_blank" class="btn3">&#8599; Open in Drive</a>'+
+        '<button id="'+id+'b" class="btn2" onclick="cp('+scrEsc+',\''+id+'b\')">&#128203; Copy for Script</button>'+
+        '<a href="'+lnkEsc+'" target="_blank" class="btn3">&#8599; Open</a>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -268,45 +259,10 @@ function cp(text,btnId){
   });
 }
 
-var PAGE_SIZE = 30;
-var _exact = [], _related = [], _shownExact = 0, _shownRelated = 0;
-
-function renderGrid(vids, from, count) {
-  return vids.slice(from, from + count).map(cardHTML).join('');
-}
-
-function section(vids, label, sub, isExact) {
-  if (!vids.length) return '';
-  return '<div class="sec-head"><span class="sec-tag' + (isExact ? '' : ' partial') + '">' + (isExact ? '&#10022; ' : '') + label + ' &mdash; ' + vids.length + ' clip' + (vids.length !== 1 ? 's' : '') + '</span><span class="sec-sub">' + sub + '</span></div><div class="grid" id="grid-' + (isExact ? 'exact' : 'related') + '">' + renderGrid(vids, 0, PAGE_SIZE) + '</div>';
-}
-
-function loadMoreExact() {
-  _shownExact = Math.min(_shownExact + PAGE_SIZE, _exact.length);
-  var g = document.getElementById('grid-exact');
-  if (g) g.innerHTML = renderGrid(_exact, 0, _shownExact);
-  updateLoadMore();
-}
-
-function loadMoreRelated() {
-  _shownRelated = Math.min(_shownRelated + PAGE_SIZE, _related.length);
-  var g = document.getElementById('grid-related');
-  if (g) g.innerHTML = renderGrid(_related, 0, _shownRelated);
-  updateLoadMore();
-}
-
-function updateLoadMore() {
-  var eb = document.getElementById('load-more-exact');
-  var rb = document.getElementById('load-more-related');
-  if (eb) {
-    var rem = _exact.length - _shownExact;
-    if (rem > 0) { eb.style.display = 'block'; eb.textContent = 'Load ' + Math.min(rem, PAGE_SIZE) + ' more best matches (' + rem + ' remaining)'; }
-    else eb.style.display = 'none';
-  }
-  if (rb) {
-    var rem2 = _related.length - _shownRelated;
-    if (rem2 > 0) { rb.style.display = 'block'; rb.textContent = 'Load ' + Math.min(rem2, PAGE_SIZE) + ' more partial matches (' + rem2 + ' remaining)'; }
-    else rb.style.display = 'none';
-  }
+function section(vids,label,sub,isExact) {
+  if(!vids.length)return '';
+  cid=0;
+  return '<div class="sec-head"><span class="sec-tag'+(isExact?'':' partial')+'">'+(isExact?'&#10022; ':'')+label+' &mdash; '+vids.length+' clip'+(vids.length!==1?'s':'')+'</span><span class="sec-sub">'+sub+'</span></div><div class="grid">'+vids.map(cardHTML).join('')+'</div>';
 }
 
 function onSearch(){state.query=document.getElementById('search').value;run();}
@@ -314,7 +270,6 @@ function setFilter(k,v){state.filters[k]=v;var s=document.getElementById('f-'+k)
 function clearFilters(){Object.keys(state.filters).forEach(function(k){state.filters[k]='ALL';});document.querySelectorAll('.fg select').forEach(function(s){s.value='ALL';s.className='';});run();}
 
 function run(){
-  cid = 0;
   var q=state.query.trim();
   var pool=window.CALILY_VIDEOS.filter(passes);
   var el=document.getElementById('results');
@@ -322,36 +277,30 @@ function run(){
   if(!q&&!hasFilters){
     document.getElementById('stats').textContent=window.CALILY_VIDEOS.length+' total videos';
     el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:8px 0 40px">'+
-      [['&#128269;','Search naturally','Type a name, product, model or scene'],['&#128203;','Copy for your brief','Find the perfect clip and grab the Drive link'],['&#128279;','Share with editors','Send the exact Drive file link directly']]
+      [['&#128269;','Search naturally','Type a name, product, model or scene'],['&#128203;','Copy for your script','Paste a formatted shot reference into your brief'],['&#128279;','Share the Drive link','Send the exact Drive file to your editors instantly']]
       .map(function(x){return '<div style="background:#fff;border:1px solid #e6ddd2;border-radius:4px;padding:20px"><div style="font-size:20px;margin-bottom:8px">'+x[0]+'</div><div style="font-size:13px;font-weight:600;color:#3a3028;margin-bottom:5px">'+x[1]+'</div><div style="font-size:12px;color:#6a5a4e;line-height:1.6">'+x[2]+'</div></div>';}).join('')+'</div>';
     return;
   }
   var words=q?q.toLowerCase().split(' ').filter(function(w){return w.length>1;}):[];
   var scored=pool.map(function(v){return{v:v,s:score(v,q)};}).filter(function(x){return !q||x.s>0;}).sort(function(a,b){return b.s-a.s;});
-  _exact=scored.filter(function(x){return !words.length||allMatch(x.v,words);}).map(function(x){return x.v;});
-  _related=scored.filter(function(x){return words.length&&!allMatch(x.v,words);}).map(function(x){return x.v;});
-  _shownExact=Math.min(PAGE_SIZE,_exact.length);
-  _shownRelated=Math.min(PAGE_SIZE,_related.length);
-  var total=_exact.length+_related.length;
+  var exact=scored.filter(function(x){return !words.length||allMatch(x.v,words);}).map(function(x){return x.v;});
+  var related=scored.filter(function(x){return words.length&&!allMatch(x.v,words);}).map(function(x){return x.v;});
+  var total=exact.length+related.length;
   document.getElementById('stats').textContent=total+' result'+(total!==1?'s':'');
   if(!total){el.innerHTML='<div class="empty"><h2>No clips found</h2><p style="font-size:12px;color:#9a8a7e">Try different keywords or clear some filters</p></div>';return;}
-  var html='';
-  if(_exact.length){
-    html+='<div class="sec-head"><span class="sec-tag">&#10022; Best matches &mdash; '+_exact.length+' clip'+(_exact.length!==1?'s':'')+'</span><span class="sec-sub">All search words found</span></div>';
-    html+='<div class="grid" id="grid-exact">'+renderGrid(_exact,0,_shownExact)+'</div>';
-    html+='<div id="load-more-exact" onclick="loadMoreExact()" style="display:none;text-align:center;margin:16px 0 8px;padding:10px 24px;background:#fff;border:1px solid #e6ddd2;border-radius:3px;cursor:pointer;font-size:11px;color:#6a5a4e;letter-spacing:0.04em"></div>';
-  }
-  if(_related.length){
-    html+=(_exact.length?'<div class="divider"></div>':'');
-    html+='<div class="sec-head"><span class="sec-tag partial">Partial matches &mdash; '+_related.length+' clip'+(_related.length!==1?'s':'')+'</span><span class="sec-sub">Some words found</span></div>';
-    html+='<div class="grid" id="grid-related">'+renderGrid(_related,0,_shownRelated)+'</div>';
-    html+='<div id="load-more-related" onclick="loadMoreRelated()" style="display:none;text-align:center;margin:16px 0 8px;padding:10px 24px;background:#fff;border:1px solid #e6ddd2;border-radius:3px;cursor:pointer;font-size:11px;color:#6a5a4e;letter-spacing:0.04em"></div>';
-  }
-  el.innerHTML=html;
-  updateLoadMore();
+  el.innerHTML=section(exact,'Best matches','All search words found',true)+(related.length?'<div class="divider"></div>':'')+section(related,'Partial matches','Some words found',false);
 }
 
 function buildFilters(){
+  // Re-read config here — guaranteed to be loaded since init() fires after config.js + data.js
+  var _cfg = window.CALILY_CONFIG || {};
+  FILTER_OPTS.who     = ['ALL'].concat(_cfg.who      || ['LILLIE','KAROLINA','STEFANIA','EMMA','GEMMA','MARGO','EMILIA','BRIDE']).concat(['OTHER/NA']);
+  FILTER_OPTS.product = ['ALL'].concat(_cfg.products || ['OPHELIA','JULIETTE','DAPHNE','SERA','CELESTINE','MIA','TESSA','AUDREY','MARINA','TALIA','EDEN','LUCINE','ATHENA','ROSALIA','FLORA','ALESSIA','JESSE','AVA','ARIA','BLAIR','SIENA','FREYA','CLEO','VIVIENNE','AURORA','LUNA','CAMELLIA','ARABELLA','MARGAUX','ESTELLE']).concat(['OTHER/NA']);
+  FILTER_OPTS.format  = ['ALL'].concat(_cfg.formats   || ['BROLL','AROLL','UGC','TESTIMONIAL','STREETINTERVIEW','MONTAGE']);
+  FILTER_OPTS.action  = ['ALL'].concat(Object.keys(_cfg.actions||{}).length ? Object.keys(_cfg.actions) : ['MODELLING','STYLING','TALKING','SHOOTING','SEWING','CUTTING','SHOWING','UNBOXING','COMPARING']).concat(['OTHER/NA']);
+  FILTER_OPTS.shot    = ['ALL'].concat(_cfg.shots     || ['CLOSEUP','PANOVER']);
+  FILTER_OPTS.mood    = ['ALL'].concat(_cfg.moods     || ['elegant','joyful','intimate','celebratory','romantic','peaceful','energetic']);
+  FILTER_OPTS.setting = ['ALL'].concat(Object.keys(_cfg.settings||{}).length ? Object.keys(_cfg.settings) : ['HOME','FACTORY','STUDIO','BEACH','BRIDALSHOP','WAREHOUSE','WEDDING','EXHIBITION','CAR']).concat(['OTHER/NA']);
   var defs=[{k:'who',l:'Who'},{k:'product',l:'Product'},{k:'folder',l:'Folder'},{k:'format',l:'Format'},{k:'setting',l:'Setting'},{k:'action',l:'Action'},{k:'shot',l:'Shot'},{k:'mood',l:'Mood'}];
   var html=defs.map(function(d){
     return '<div class="fg"><label>'+d.l+'</label><select id="f-'+d.k+'" onchange="setFilter(\''+d.k+'\',this.value)">'+(FILTER_OPTS[d.k]||[]).map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select></div>';
@@ -361,7 +310,7 @@ function buildFilters(){
 }
 
 function buildSuggestions(){
-  var s=['Lillie veil studio','Emilia modeling','Freya veil','Karolina','closeup','Bali shoot','China factory'];
+  var s=(_cfg.suggestions)||['Lillie veil studio','Emilia modeling','Freya veil','Karolina','closeup','Bali shoot','China factory'];
   document.getElementById('suggestions').innerHTML=s.map(function(t){
     return '<button onclick="document.getElementById(\'search\').value=\''+t+'\';state.query=\''+t+'\';run()" style="background:#fff;border:1px solid #e6ddd2;color:#6a5a4e;border-radius:20px;padding:5px 14px;font-size:11px;cursor:pointer">'+t+'</button>';
   }).join('');
@@ -378,6 +327,7 @@ function init(){
 }
 </script>
 
+<script src="config.js"></script>
 <script src="data.js" onload="init()" onerror="document.getElementById('results').innerHTML='<div class=\'loading\' style=\'color:#c04040\'>Error: data.js not found. Make sure both files are uploaded to GitHub.</div>'"></script>
 
 </body>
