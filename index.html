@@ -57,6 +57,8 @@ mark{background:rgba(192,160,112,0.2);color:#9a7a50;border-radius:2px;padding:0 
 .footer{border-top:1px solid #e6ddd2;background:#fff;padding:14px 40px;display:flex;justify-content:space-between;margin-top:40px}
 .divider{height:1px;background:#e6ddd2;margin:8px 0 28px}
 .loading{text-align:center;padding:80px 20px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#b5a494;font-style:italic}
+.btt{position:fixed;bottom:28px;right:28px;width:38px;height:38px;border-radius:50%;background:#3a3028;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:100;box-shadow:0 2px 8px rgba(58,48,40,0.25);transition:background 0.2s}
+.btt:hover{background:#b8965a}
 </style>
 </head>
 <body>
@@ -379,6 +381,12 @@ function init(){
 </script>
 
 <script src="data.js" onload="init()" onerror="document.getElementById('results').innerHTML='<div class=\'loading\' style=\'color:#c04040\'>Error: data.js not found. Make sure both files are uploaded to GitHub.</div>'"></script>
-
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="18,15 12,9 6,15"/></svg>
+</button>
+<script>
+var btt=document.getElementById('btt');
+window.addEventListener('scroll',function(){btt.style.display=window.scrollY>400?'flex':'none';});
+</script>
 </body>
 </html>
